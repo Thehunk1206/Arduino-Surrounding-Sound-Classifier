@@ -6,19 +6,26 @@ This script is use to create Audio FFT dataset with arduino nano ble sense.
 '''
 import serial
 import time
+import numpy as np
 
-ser = serial.Serial('/dev/ttyACM0', 115200,)
+ser = serial.Serial('/dev/ttyACM0', 115200, timeout=4)
 
 
 def captureAudio():
-    audio_data = ser.readline()
-    print(audio_data.decode('Ascii'))
+    audio_data_str = ser.readline()
+    audio_data_str = audio_data_str.decode('Ascii')
+    audio_data_str = audio_data_str[1:len(audio_data_str)-6]
+    audio_data_str = audio_data_str.split(",")
+    audio_data_np = np.array(audio_data_str)
+    audio_data_np = audio_data_np.astype(np.float)
+    audio_data_np = audio_data_np.reshape(1,-1)
+    print(audio_data_np.shape)
     
 
 if __name__ == "__main__":
     time.sleep(1)
     
-    for _ in range(6):
+    for _ in range(5):
         ser.write(b'1')
         captureAudio()
     ser.close()
