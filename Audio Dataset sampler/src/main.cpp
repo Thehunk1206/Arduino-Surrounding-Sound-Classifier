@@ -7,10 +7,10 @@
 arduinoFFT fft = arduinoFFT();
 
 #define SERIAL_PLOT_MODE false
-#define PDM_SOUND_GAIN 60 // sound gain of PDM mic
+#define PDM_SOUND_GAIN 30 // sound gain of PDM mic
 #define BUFFER_SIZE 512   // buffer size of PDM mic
 
-#define SAMPLE_DELAY 2 // delay time (ms) between sampling
+#define SAMPLE_DELAY 4 // delay time (ms) between sampling
 #define TOTAL_SAMPLE 5
 
 #define SAMPLING_FREQ 16000 // sampling frequency of on Board microphone
@@ -46,7 +46,7 @@ double getAudiospectrum(double *vReal, double *vImaginary, unsigned int samples)
 void setup()
 {
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial)
     ;
 
@@ -65,8 +65,8 @@ void setup()
       ;
   }
 
-  if (!SERIAL_PLOT_MODE)
-    Serial.println("Send '1' to capture audio!!");
+  // if (!SERIAL_PLOT_MODE)
+  //   Serial.println("Send '1' to capture audio!!");
 }
 
 void loop()
@@ -77,8 +77,8 @@ void loop()
     if (command == '1')
     {
       delay(500);
-      if (!SERIAL_PLOT_MODE)
-        Serial.println("======capturing audio=====");
+      // if (!SERIAL_PLOT_MODE)
+      //   Serial.println("======capturing audio=====");
 
       digitalWrite(LEDG, LOW);
       for (unsigned short i = 0; i < BUFFER_SIZE; i++)
@@ -97,8 +97,8 @@ void loop()
       if (!SERIAL_PLOT_MODE)
       {
 
-        Serial.println("sample number: ");
-        Serial.println(total_counter + 1);
+        // Serial.println("sample number: ");
+        // Serial.println(total_counter + 1);
         Serial.print("[");
       }
 
@@ -111,7 +111,7 @@ void loop()
         }
         else
         {
-          Serial.println(vReal[i]);
+          Serial.print(vReal[i]);
         }
       }
       if (!SERIAL_PLOT_MODE)
@@ -131,7 +131,6 @@ void loop()
         total_counter++;
         if (total_counter >= TOTAL_SAMPLE)
         {
-          Serial.println("# === Voice data end ===");
           digitalWrite(LEDG, LOW);
           PDM.end();
           while (1)
