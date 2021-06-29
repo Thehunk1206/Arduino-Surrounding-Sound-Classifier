@@ -3,6 +3,8 @@ Python script to read data from serial port and write to numpy array
 
 This script is use to create Audio FFT dataset with arduino nano ble sense.
 
+TODO: Continously capture the data and concate in a numpy array.
+TODO: Later serialize the data as .np file for training the model
 '''
 import serial
 import time
