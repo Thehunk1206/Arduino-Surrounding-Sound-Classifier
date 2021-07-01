@@ -103,6 +103,7 @@ void loop()
         Serial.print("[");
       }
 
+      //Starting from 8th position because, the low frequency spectrum are too noisy
       for (unsigned short i = 8; i < BUFFER_SIZE / 2; i++)
       {
         if (!SERIAL_PLOT_MODE)

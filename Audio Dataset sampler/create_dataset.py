@@ -18,9 +18,6 @@ import argparse
 import numpy as np
 
 
-# NOTE serial port here is for linux machine, do check out for windows and MAC
-PORT = '/dev/ttyACM0'
-BAUD_RATE = 115200
 SERIAL_TIMEOUT = 4
 DATASET_PATH = "Dataset/"
 
@@ -35,9 +32,24 @@ def init_argparser() -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--serialport", "-sp",
+        type=str,
+        required=True,
+        help="Serial Port of arduino"
+    )
+
+    parser.add_argument(
+        "--baudrate", "-b",
+        type=str,
+        required=False,
+        help="Baudrate of Serial communication",
+        default=9600
+    )
+
+    parser.add_argument(
         "--dsize", "-ds",
         type=int,
-        required=True,
+        required=False,
         help="Audio FFT dataset size",
         default=100
     )
@@ -54,16 +66,21 @@ def init_argparser() -> argparse.Namespace:
     return args
 
 
-def init_serial_port():
+def init_serial_port(port: str, baudrate: int = 9600):
     global ser
     try:
-        ser = serial.Serial(PORT, baudrate=BAUD_RATE, timeout=SERIAL_TIMEOUT)
+        ser = serial.Serial(port, baudrate=baudrate, timeout=SERIAL_TIMEOUT)
+        print(
+            f"[info] Serial port opened \nPORT: {port}\nBaud rate: {baudrate}\n\n")
     except SerialException as e:
         print(e.strerror)
         sys.exit()
 
 
 def save_numpy_array(arr: np.ndarray, filename: str):
+    '''
+    saves the numpy array in .npy binary file
+    '''
     try:
         np.save(f"{DATASET_PATH}{filename}", arr=arr)
         print(f"[info] Data saved at {DATASET_PATH}{filename}.npy")
@@ -73,7 +90,7 @@ def save_numpy_array(arr: np.ndarray, filename: str):
 
 def captureSerialData() -> np.ndarray:
     '''
-    The functions does the following
+    This functions does the following
     1.Read data from serial port.
     2.Decode serial data as Ascii.
     3.Create list of string data points by split() with Deliminator as ','.
@@ -95,7 +112,24 @@ def createDataset(
     number_of_data_instance: int = 100,
     dataset: list = []
 ):
+    '''
+    Creates numpy dataset by appending each captured audio FFT data in python list.
+    Converting that python list to numpy array.
+    Finally saving numpy array as .npy bin file to use later
 
+    args:
+        class_label : str
+            Label name(i.e class name) of data
+        number_of_data_instancce : int = 100
+            Number of data points to capture for given label
+        dataset : list = []
+            An epmty python list where data is appended
+    '''
+    print(
+        f"=============Capturing Audio FFT data=========\n \
+        [info] NUMBER OF SAMPLE: {number_of_data_instance}\n \
+        [info] LABEL: {class_label}\n\n"
+    )
     for i in range(number_of_data_instance):
         ser.write(b'1')
         np_audio_data = captureSerialData()
@@ -110,12 +144,14 @@ def createDataset(
 
 if __name__ == "__main__":
 
+    # Initialize argparser
     args = init_argparser()
 
     if not os.path.exists(DATASET_PATH):
         os.mkdir(DATASET_PATH)
 
-    init_serial_port()
+    #initialize serial communication
+    init_serial_port(port=args.serialport, baudrate=args.baudrate)
 
     createDataset(
         class_label=args.label,
