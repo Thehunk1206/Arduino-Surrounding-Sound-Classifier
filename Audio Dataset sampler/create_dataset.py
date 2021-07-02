@@ -16,7 +16,7 @@ import time
 import argparse
 
 import numpy as np
-
+import pandas as pd
 
 SERIAL_TIMEOUT = 4
 DATASET_PATH = "Dataset/"
@@ -77,7 +77,7 @@ def init_serial_port(port: str, baudrate: int = 9600):
         sys.exit()
 
 
-def save_numpy_array(arr: np.ndarray, filename: str):
+def save_as_numpy_array(arr: np.ndarray, filename: str):
     '''
     saves the numpy array in .npy binary file
     '''
@@ -86,6 +86,10 @@ def save_numpy_array(arr: np.ndarray, filename: str):
         print(f"[info] Data saved at {DATASET_PATH}{filename}.npy")
     except:
         print("Cannot save the numpy array")
+
+def save_as_panda_dataframe():
+
+    pass
 
 
 def captureSerialData() -> np.ndarray:
@@ -139,7 +143,7 @@ def createDataset(
         time.sleep(0.5)
     ser.close()
     dataset_np = np.array(dataset)
-    save_numpy_array(dataset_np, class_label)
+    save_as_numpy_array(dataset_np, class_label)
 
 
 if __name__ == "__main__":
