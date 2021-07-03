@@ -138,7 +138,7 @@ def captureSerialData() -> str:
     return audio_data_str
 
 
-def createDataset(class_label: str, number_of_data_instance: int = 100, dataset: list = []):
+def createDataset(class_label: str, number_of_data_instance: int = 100):
     '''
     Creates numpy dataset by appending each captured audio FFT data in python list.
     Converting that python list to numpy array.
@@ -149,8 +149,6 @@ def createDataset(class_label: str, number_of_data_instance: int = 100, dataset:
             Label name(i.e class name) of data
         number_of_data_instancce : int = 100
             Number of data points to capture for given label
-        dataset : list = []
-            An epmty python list where data is appended
     '''
 
     print(
