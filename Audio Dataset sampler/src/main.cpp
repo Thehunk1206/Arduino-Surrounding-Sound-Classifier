@@ -2,9 +2,10 @@
 
 #include <math.h>
 #include <PDM.h>
-#include <arduinoFFT.h>
 
-arduinoFFT fft = arduinoFFT();
+// #include <arduinoFFT.h>
+
+// arduinoFFT fft = arduinoFFT();
 
 /*
 NOTE: set SERIAL_PLOT_MODE to false while creating FFT audio dataset
@@ -12,37 +13,43 @@ LED_BUILTIN will be on if upload the in Serial plot mode
 */
 #define SERIAL_PLOT_MODE false
 #define PDM_SOUND_GAIN 30 // sound gain of PDM mic
-#define BUFFER_SIZE 512   // buffer size of PDM mic
+#define BUFFER_SIZE 256   // buffer size of PDM mic
 
-#define SAMPLE_DELAY 2      // delay time (ms) between sampling
+#define SAMPLE_DELAY 8      // delay time (ms) between sampling
 #define SAMPLING_FREQ 16000 // sampling frequency of on Board microphone
 #define CHANNEL 1           // Number of Channel Microphone has
 
-volatile int samplesRead;
+volatile float rms;
 
 short sample_buffer[BUFFER_SIZE];
-double vReal[BUFFER_SIZE];
-double vImaginary[BUFFER_SIZE];
+short feature_data[BUFFER_SIZE / 2];
+// double vReal[BUFFER_SIZE];
+// double vImaginary[BUFFER_SIZE];
 
 // callback function for PDM mic
 void onPDMdata()
 {
+  rms = -1;
 
   int bytes_available = PDM.available();
   PDM.read(sample_buffer, bytes_available);
 
-  samplesRead = bytes_available / 2;
+  // calculate RMS (root mean square) from sample_buffer
+  unsigned int sum = 0;
+  for (unsigned short i = 0; i < (bytes_available / 2); i++)
+    sum += pow(sample_buffer[i], 2);
+  rms = sqrt(double(sum) / (double(bytes_available) / 2.0));
 }
 
 // Transfor Audio raw data from time domain to frquency domain
-double getAudiospectrum(double *vReal, double *vImaginary, unsigned int samples)
-{
-  fft.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-  fft.Compute(vReal, vImaginary, samples, FFT_FORWARD);
-  fft.ComplexToMagnitude(vReal, vImaginary, samples);
+// double getAudiospectrum(double *vReal, double *vImaginary, unsigned int samples)
+// {
+//   fft.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+//   fft.Compute(vReal, vImaginary, samples, FFT_FORWARD);
+//   fft.ComplexToMagnitude(vReal, vImaginary, samples);
 
-  return double(*vReal);
-}
+//   return double(*vReal);
+// }
 
 void setup()
 {
@@ -85,35 +92,38 @@ void loop()
       delay(200);
       digitalWrite(LEDR, HIGH);
       digitalWrite(LEDG, LOW);
-      for (unsigned short i = 0; i < BUFFER_SIZE; i++)
+      for (unsigned short i = 0; i < BUFFER_SIZE / 2; i++)
       { // sampling
-        vReal[i] = sample_buffer[i];
-        vImaginary[i] = 0.0;
+        while (rms < 0)
+          ;
+        feature_data[i] = rms;
+        // vReal[i] = sample_buffer[i];
+        // vImaginary[i] = 0.0;
+
         delay(SAMPLE_DELAY);
       }
 
       digitalWrite(LEDG, HIGH);
 
-      getAudiospectrum(vReal, vImaginary, BUFFER_SIZE);
+      // getAudiospectrum(vReal, vImaginary, BUFFER_SIZE);
 
-      samplesRead = 0;
+      // samplesRead = 0;
       // pring out sampling data
       if (!SERIAL_PLOT_MODE)
       {
         Serial.print("[");
       }
 
-      //Starting from 8th position because, the low frequency spectrum are too noisy
-      for (unsigned short i = 8; i < BUFFER_SIZE / 2; i++)
+      for (unsigned short i = 0; i < BUFFER_SIZE / 2; i++)
       {
         if (!SERIAL_PLOT_MODE)
         {
-          Serial.print(vReal[i]);
+          Serial.print(feature_data[i]);
           Serial.print(", ");
         }
         else
         {
-          Serial.println(vReal[i]);
+          Serial.println(feature_data[i]);
         }
       }
       if (!SERIAL_PLOT_MODE)

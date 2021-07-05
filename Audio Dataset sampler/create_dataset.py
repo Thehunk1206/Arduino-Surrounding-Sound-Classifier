@@ -24,7 +24,7 @@ DATASET_PATH = "Dataset/"
 Writing captured data into csv using pandas
 '''
 AUDIO_FFT_DATA_DICT = {
-    "audio_spectrum_vec": [],
+    "audio_rms_vec": [],
     "target": []
 }
 
@@ -106,13 +106,13 @@ def clear_audio_dict():
     clear the dataframe dict before writing new captured data 
     to avoid duplicates and repetition of data in csv
     '''
-    AUDIO_FFT_DATA_DICT["audio_spectrum_vec"].clear()
+    AUDIO_FFT_DATA_DICT["audio_rms_vec"].clear()
     AUDIO_FFT_DATA_DICT["target"].clear()
 
 
 def write_to_csv(captured_data: str, class_label: str) -> bool:
     clear_audio_dict()
-    AUDIO_FFT_DATA_DICT["audio_spectrum_vec"].append(captured_data)
+    AUDIO_FFT_DATA_DICT["audio_rms_vec"].append(captured_data)
     AUDIO_FFT_DATA_DICT["target"].append(class_label)
     df = pd.DataFrame(AUDIO_FFT_DATA_DICT)
 
@@ -140,7 +140,7 @@ def captureSerialData() -> str:
 
 def createDataset(class_label: str, number_of_data_instance: int = 100):
     '''
-    Creates numpy dataset by appending each captured audio FFT data in python list.
+    Creates numpy dataset by appending each captured audio data in python list.
     Converting that python list to numpy array.
     Finally saving numpy array as .npy bin file to use later
 
@@ -152,7 +152,7 @@ def createDataset(class_label: str, number_of_data_instance: int = 100):
     '''
 
     print(
-        f"=============Capturing Audio FFT data=========\n \
+        f"=============Capturing Audio data=========\n \
         [info] NUMBER OF SAMPLE: {number_of_data_instance}\n \
         [info] LABEL: {class_label}\n\n"
     )
@@ -167,12 +167,12 @@ def createDataset(class_label: str, number_of_data_instance: int = 100):
 
         if has_wrtitten_to_csv:
             print(
-                f"[info] Captured audio FFT written to csv => {DATASET_PATH}/surrounding_audio_dataset_FFT.csv\n")
+                f"[info] Captured audio data written to csv => {DATASET_PATH}/surrounding_audio_dataset_FFT.csv\n")
         else:
             print("[Error] Something went wrong while writting data to csv file")
             sys.exit()
 
-        time.sleep(0.5)
+        time.sleep(1)
     ser.close()
 
 
