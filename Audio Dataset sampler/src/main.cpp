@@ -14,7 +14,7 @@ LED_BUILTIN will be on if upload the in Serial plot mode
 #define PDM_SOUND_GAIN 30 // sound gain of PDM mic
 #define BUFFER_SIZE 512   // buffer size of PDM mic
 
-#define SAMPLE_DELAY 2      // delay time (ms) between sampling
+#define SAMPLE_DELAY 2000      // delay time (micro sec) between sampling
 #define SAMPLING_FREQ 16000 // sampling frequency of on Board microphone
 #define CHANNEL 1           // Number of Channel Microphone has
 
@@ -23,6 +23,7 @@ volatile int samplesRead;
 short sample_buffer[BUFFER_SIZE];
 double vReal[BUFFER_SIZE];
 double vImaginary[BUFFER_SIZE];
+unsigned int reference_amp = 1;
 
 // callback function for PDM mic
 void onPDMdata()
@@ -34,7 +35,7 @@ void onPDMdata()
   samplesRead = bytes_available / 2;
 }
 
-// Transfor Audio raw data from time domain to frquency domain
+// Transform Audio raw data from time domain to frquency domain
 double getAudiospectrum(double *vReal, double *vImaginary, unsigned int samples)
 {
   fft.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
@@ -89,7 +90,7 @@ void loop()
       { // sampling
         vReal[i] = sample_buffer[i];
         vImaginary[i] = 0.0;
-        delay(SAMPLE_DELAY);
+        delayMicroseconds(SAMPLE_DELAY);
       }
 
       digitalWrite(LEDG, HIGH);
@@ -108,12 +109,12 @@ void loop()
       {
         if (!SERIAL_PLOT_MODE)
         {
-          Serial.print(vReal[i]);
+          Serial.print(20*log10(vReal[i]/reference_amp));
           Serial.print(", ");
         }
         else
         {
-          Serial.println(vReal[i]);
+          Serial.println(20*log10(vReal[i]/reference_amp));
         }
       }
       if (!SERIAL_PLOT_MODE)
