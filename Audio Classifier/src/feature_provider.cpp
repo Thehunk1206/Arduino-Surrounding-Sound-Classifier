@@ -40,6 +40,11 @@ TfLiteStatus FeatureProvider::PopulateFeatureData(
                          feature_size_, kFeatureElementCount);
     return kTfLiteError;
   }
+  else{
+    TF_LITE_REPORT_ERROR(error_reporter,
+                         "Requested feature_data_ size is %d",
+                         feature_size_);
+  }
 
   // Quantize the time into steps as long as each window stride, so we can
   // figure out which audio data we need to fetch.

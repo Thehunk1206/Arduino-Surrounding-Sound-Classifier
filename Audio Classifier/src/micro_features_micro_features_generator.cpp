@@ -48,7 +48,7 @@ TfLiteStatus InitializeMicroFeatures(tflite::ErrorReporter* error_reporter) {
   config.pcan_gain_control.strength = 0.95;
   config.pcan_gain_control.offset = 80.0;
   config.pcan_gain_control.gain_bits = 21;
-  config.log_scale.enable_log = 1;
+  config.log_scale.enable_log = 0;
   config.log_scale.scale_shift = 6;
   if (!FrontendPopulateState(&config, &g_micro_features_state,
                              kAudioSampleFrequency)) {
