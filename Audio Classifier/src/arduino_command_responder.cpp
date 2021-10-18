@@ -51,17 +51,17 @@ void RespondToCommand(tflite::ErrorReporter* error_reporter,
     TF_LITE_REPORT_ERROR(error_reporter, "Heard %s (%d) @%dms", found_command,
                          score, current_time);
     // If we hear a command, light up the appropriate LED
-    if (found_command[0] == 'W') {
+    if (found_command[0] == 'WHISTLE') {
       last_command_time = current_time;
       digitalWrite(LEDG, LOW);  // Green for whistle
     }
 
-    if (found_command[0] == 'G') {
+    if (found_command[0] == 'GLASS_BREAK') {
       last_command_time = current_time;
       digitalWrite(LEDR, LOW);  // Red for Glass Break 
     }
 
-    if (found_command[0] == 'F') {
+    if (found_command[0] == 'FAN') {
       last_command_time = current_time;
       digitalWrite(LEDB, LOW);  // Blue for FAN
     }
